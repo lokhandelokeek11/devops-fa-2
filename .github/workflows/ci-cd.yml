@@ -1,0 +1,99 @@
+name: CI/CD
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  pipeline:
+    name: Source, Build, Test, Containerize, Deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: |
+            frontend/package-lock.json
+            backend/package-lock.json
+
+      - name: Install frontend dependencies
+        working-directory: frontend
+        run: npm ci
+
+      - name: Install backend dependencies
+        working-directory: backend
+        run: npm ci
+
+      - name: Frontend lint
+        working-directory: frontend
+        run: npm run lint
+
+      - name: Frontend test
+        working-directory: frontend
+        run: npm test
+
+      - name: Backend test
+        working-directory: backend
+        run: npm test
+
+      - name: Frontend build
+        working-directory: frontend
+        run: npm run build
+
+      - name: Backend build
+        working-directory: backend
+        run: npm run build
+
+      - name: Docker build
+        run: |
+          docker build -t smart-campus-frontend:ci ./frontend
+          docker build -t smart-campus-backend:ci ./backend
+
+      - name: Docker image validation
+        run: |
+          docker image inspect smart-campus-frontend:ci >/dev/null
+          docker image inspect smart-campus-backend:ci >/dev/null
+          docker run --rm smart-campus-backend:ci node -e "const mod=require('./dist/app'); const app=mod.default||mod; if(typeof app!=='function'){console.error('backend app export missing'); process.exit(1)} console.log('backend image ok')"
+          docker run -d --name campus-frontend-validate -p 18080:80 smart-campus-frontend:ci
+          ok=0
+          for _ in 1 2 3 4 5 6 7 8 9 10; do
+            if curl -fsS http://127.0.0.1:18080/ >/dev/null; then
+              ok=1
+              break
+            fi
+            sleep 1
+          done
+          docker rm -f campus-frontend-validate
+          test "$ok" = 1
+          echo "Docker images validated"
+
+      - name: Deployment preparation
+        run: |
+          docker compose config >/dev/null
+          docker run --rm -v "$PWD:/src" -w /src ghcr.io/yannh/kubeconform:v0.6.7 -summary -strict devops/kubernetes
+          echo "Kubernetes manifests are ready for Minikube"
+
+      - name: Push images to Docker Hub
+        if: github.event_name == 'push'
+        env:
+          DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+          DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+        run: |
+          if [ -z "$DOCKERHUB_USERNAME" ] || [ -z "$DOCKERHUB_TOKEN" ]; then
+            echo "Docker Hub secrets are not configured. Skipping image push."
+            exit 0
+          fi
+          echo "$DOCKERHUB_TOKEN" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
+          docker tag smart-campus-frontend:ci "$DOCKERHUB_USERNAME/smart-campus-frontend:latest"
+          docker tag smart-campus-backend:ci "$DOCKERHUB_USERNAME/smart-campus-backend:latest"
+          docker push "$DOCKERHUB_USERNAME/smart-campus-frontend:latest"
+          docker push "$DOCKERHUB_USERNAME/smart-campus-backend:latest"
