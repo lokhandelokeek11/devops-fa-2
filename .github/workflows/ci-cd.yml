@@ -65,15 +65,20 @@ jobs:
           docker run --rm smart-campus-backend:ci node -e "const mod=require('./dist/app'); const app=mod.default||mod; if(typeof app!=='function'){console.error('backend app export missing'); process.exit(1)} console.log('backend image ok')"
           docker run -d --name campus-frontend-validate -p 18080:80 smart-campus-frontend:ci
           ok=0
-          for _ in 1 2 3 4 5 6 7 8 9 10; do
+          for _ in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15; do
             if curl -fsS http://127.0.0.1:18080/ >/dev/null; then
               ok=1
               break
             fi
             sleep 1
           done
+          if [ "$ok" != 1 ]; then
+            echo "Frontend container did not serve the application"
+            docker logs campus-frontend-validate || true
+            docker rm -f campus-frontend-validate
+            exit 1
+          fi
           docker rm -f campus-frontend-validate
-          test "$ok" = 1
           echo "Docker images validated"
 
       - name: Deployment preparation
