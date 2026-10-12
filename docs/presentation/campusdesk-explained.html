@@ -1,0 +1,772 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>CampusDesk — Project explained</title>
+  <style>
+    :root {
+      --ink: #1b2430;
+      --muted: #4d5b6a;
+      --line: #d7dfd8;
+      --paper: #f6f3ec;
+      --card: #fffdf8;
+      --teal: #0e6b63;
+      --teal-soft: #e5f3f0;
+      --gold: #8a5a12;
+      --gold-soft: #f8efd8;
+      --rose: #8d3b3b;
+    }
+
+    * { box-sizing: border-box; }
+
+    html { font-size: 16px; }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: #e7e2d8;
+      font-family: "Segoe UI", Calibri, sans-serif;
+      line-height: 1.55;
+    }
+
+    .sheet {
+      max-width: 920px;
+      margin: 24px auto 48px;
+      background: white;
+      box-shadow: 0 10px 40px rgba(27, 36, 48, 0.12);
+    }
+
+    .page {
+      padding: 48px 56px 40px;
+    }
+
+    .cover {
+      min-height: 100vh;
+      background:
+        linear-gradient(165deg, #12352f 0%, #0e6b63 46%, #1b2430 100%);
+      color: #f7f4ee;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 64px 60px 48px;
+    }
+
+    .eyebrow {
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: #c8ebe4;
+    }
+
+    h1 {
+      font-family: Georgia, "Times New Roman", serif;
+      font-weight: 700;
+      font-size: 3.1rem;
+      line-height: 1.05;
+      margin: 18px 0 12px;
+    }
+
+    .subtitle {
+      font-size: 1.25rem;
+      max-width: 34rem;
+      color: #e7f4f1;
+    }
+
+    .cover-box {
+      margin-top: 36px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      border-radius: 16px;
+      padding: 18px 20px;
+      max-width: 40rem;
+    }
+
+    .cover-box strong { color: #fff; }
+
+    .path {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 28px;
+    }
+
+    .path span {
+      background: rgba(255, 255, 255, 0.12);
+      border-radius: 999px;
+      padding: 6px 12px;
+      font-size: 0.86rem;
+    }
+
+    .meta {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      font-size: 0.92rem;
+      color: #d5ebe6;
+      border-top: 1px solid rgba(255, 255, 255, 0.2);
+      padding-top: 18px;
+      margin-top: 48px;
+    }
+
+    h2 {
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 1.85rem;
+      margin: 0 0 8px;
+      line-height: 1.2;
+    }
+
+    h3 {
+      font-size: 1.12rem;
+      margin: 22px 0 6px;
+      color: #12352f;
+    }
+
+    p { margin: 0 0 12px; }
+
+    .lead {
+      font-size: 1.08rem;
+      color: #243140;
+    }
+
+    .kicker {
+      color: var(--teal);
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      font-size: 0.75rem;
+      margin-bottom: 8px;
+    }
+
+    a { color: var(--teal); }
+
+    ol.toc { margin: 8px 0 0; padding-left: 1.2rem; }
+    ol.toc li { margin: 4px 0; }
+
+    .callout {
+      background: var(--teal-soft);
+      border-left: 4px solid var(--teal);
+      padding: 12px 16px;
+      border-radius: 0 10px 10px 0;
+      margin: 14px 0 18px;
+    }
+
+    .gold {
+      background: var(--gold-soft);
+      border-left-color: var(--gold);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin: 12px 0 8px;
+    }
+
+    .card {
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 12px 14px;
+    }
+
+    .card h3 { margin-top: 0; }
+
+    .term {
+      break-inside: avoid;
+      border-top: 1px solid var(--line);
+      padding: 10px 0 4px;
+    }
+
+    .term h3 { margin: 0 0 4px; font-size: 1.02rem; }
+
+    .plain {
+      display: inline-block;
+      background: var(--gold-soft);
+      color: var(--gold);
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      border-radius: 999px;
+      padding: 2px 8px;
+      margin-left: 6px;
+      vertical-align: 2px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 10px 0 16px;
+      font-size: 0.92rem;
+    }
+
+    th, td {
+      border: 1px solid #c9d4cc;
+      padding: 8px 10px;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th {
+      background: #12352f;
+      color: #f6f3ec;
+      font-weight: 650;
+    }
+
+    tr:nth-child(even) td { background: #f7faf8; }
+
+    .excellent td:first-child,
+    td.hit {
+      background: #e7f6e8;
+    }
+
+    .flow {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+      margin: 12px 0 16px;
+    }
+
+    .flow b {
+      background: #12352f;
+      color: white;
+      border-radius: 8px;
+      padding: 7px 10px;
+      font-weight: 650;
+      font-size: 0.88rem;
+    }
+
+    .flow i {
+      color: var(--teal);
+      font-style: normal;
+      font-weight: 700;
+    }
+
+    ul { margin: 6px 0 12px; padding-left: 1.2rem; }
+    li { margin: 4px 0; }
+
+    .small { color: var(--muted); font-size: 0.9rem; }
+
+    footer.note {
+      margin-top: 28px;
+      color: var(--muted);
+      font-size: 0.85rem;
+      border-top: 1px solid var(--line);
+      padding-top: 10px;
+    }
+
+    @page {
+      size: A4;
+      margin: 14mm 14mm 16mm;
+    }
+
+    @media print {
+      body { background: white; }
+      .sheet { margin: 0; max-width: none; box-shadow: none; }
+      .page { padding: 0; }
+      .cover {
+        min-height: 250mm;
+        page-break-after: always;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+      h2, h3, .term, .card, table, .callout { break-inside: avoid; }
+      .section { break-before: page; }
+      a { text-decoration: none; color: inherit; }
+      * {
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+    }
+  </style>
+</head>
+<body>
+  <article class="sheet">
+    <header class="cover">
+      <div>
+        <div class="eyebrow">FA2 DevOps project guide</div>
+        <h1>CampusDesk</h1>
+        <p class="subtitle">Smart Campus Maintenance and Service Request System, explained in plain language.</p>
+        <div class="cover-box">
+          <strong>In one sentence.</strong>
+          Students report broken fans, dead projectors, and bad Wi-Fi. Administrators track those reports until they are fixed. The same repository also shows how that software is built, tested, packed, deployed, and watched.
+        </div>
+        <div class="path" aria-label="Delivery path">
+          <span>Developer</span>
+          <span>GitHub</span>
+          <span>GitHub Actions</span>
+          <span>Build</span>
+          <span>Test</span>
+          <span>Docker</span>
+          <span>Terraform</span>
+          <span>Kubernetes</span>
+          <span>App</span>
+          <span>Prometheus</span>
+          <span>Grafana</span>
+        </div>
+      </div>
+      <div class="meta">
+        <div>College demonstration project<br />Two apps, one delivery pipeline</div>
+        <div>Marks focus: FA2 rubric, 10 marks<br />Excellent column explained inside</div>
+      </div>
+    </header>
+
+    <section class="page">
+      <div class="kicker">Start here</div>
+      <h2>What this project actually is</h2>
+      <p class="lead">CampusDesk is a small college website for campus repairs, wrapped in a full DevOps delivery path. The website is the product. The pipeline is what the FA2 rubric is mainly grading.</p>
+      <div class="grid">
+        <div class="card">
+          <h3>The product</h3>
+          <p>A student types a problem: title, description, category, location, and priority. An administrator later changes the status to In Progress, Resolved, or Rejected, and can write how it was fixed.</p>
+        </div>
+        <div class="card">
+          <h3>The DevOps story</h3>
+          <p>Code lives on GitHub. A workflow builds it, tests it, puts it in Docker images, uses Terraform to place it on Kubernetes, and checks that Prometheus can see the running API.</p>
+        </div>
+      </div>
+      <div class="callout">
+        There is no separate login server and no machine-learning part. The header switch between Student and Admin is a demonstration role, enough for a viva. A real college system would put proper login in front of the same API.
+      </div>
+      <h3>What you can open</h3>
+      <table>
+        <thead>
+          <tr><th>Screen</th><th>Address in the app</th><th>Who it is for</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Introduction</td><td>/</td><td>Anyone</td></tr>
+          <tr><td>Student dashboard</td><td>/dashboard</td><td>Student</td></tr>
+          <tr><td>New request</td><td>/requests/new</td><td>Student</td></tr>
+          <tr><td>My requests</td><td>/requests</td><td>Student</td></tr>
+          <tr><td>One request</td><td>/requests/:id</td><td>Student or admin</td></tr>
+          <tr><td>Admin dashboard</td><td>/admin</td><td>Admin</td></tr>
+          <tr><td>All requests</td><td>/admin/requests</td><td>Admin</td></tr>
+        </tbody>
+      </table>
+      <p class="small">Contents of this guide: the idea, every important word, what was built, the live numbers on the Grafana board, and the Excellent column of the 10-mark FA2 rubric.</p>
+    </section>
+
+    <section class="page section">
+      <div class="kicker">The idea</div>
+      <h2>The problem, and the queue that replaces chat</h2>
+      <p>On a campus, small failures are constant: a socket sparks, a lab PC will not boot, a projector stays dark, a chair is cracked, a washroom needs cleaning. If those reports live in WhatsApp groups, they get buried. Nobody can see what is still open, what is urgent, or who already reported the same thing.</p>
+      <p>CampusDesk keeps one queue. Every report has a place, a category, a priority, and a status. Facilities staff do not hunt through messages. They open the admin table, filter, and update the row.</p>
+      <h3>One request, from typing to “resolved”</h3>
+      <div class="flow">
+        <b>Student form</b><i>→</i>
+        <b>API checks the fields</b><i>→</i>
+        <b>Row saved as Pending</b><i>→</i>
+        <b>Admin changes status</b><i>→</i>
+        <b>Notes stored</b>
+      </div>
+      <ul>
+        <li><strong>Categories:</strong> Electrical, Wi-Fi, Computer/Lab, Classroom, Projector, Furniture, Cleanliness, Other.</li>
+        <li><strong>Priorities:</strong> Low, Medium, High, Critical.</li>
+        <li><strong>Statuses:</strong> Pending, In Progress, Resolved, Rejected. A new request always starts as Pending.</li>
+      </ul>
+      <p>The student name in the header is stored in the browser and sent with each new request, so “My Requests” can show that person’s reports. Sample names in the seed data are Aisha Khan, Rahul Menon, and Neha Iyer.</p>
+    </section>
+
+    <section class="page section">
+      <div class="kicker">How the pieces talk</div>
+      <h2>Architecture, without the jargon first</h2>
+      <p>Think of three rooms. The browser is the front desk. The API is the office that checks forms and writes in the register. The database is the register. Two extra people stand outside and watch the office: Prometheus writes down how busy the office is, and Grafana turns those notes into charts.</p>
+      <div class="flow">
+        <b>Browser</b><i>→</i>
+        <b>Frontend</b><i>→</i>
+        <b>Backend API</b><i>→</i>
+        <b>Postgres</b>
+      </div>
+      <div class="flow">
+        <b>Prometheus</b><i>asks</i>
+        <b>GET /metrics</b><i>then</i>
+        <b>Grafana</b><i>reads</i>
+        <b>Prometheus</b>
+      </div>
+      <table>
+        <thead>
+          <tr><th>Piece</th><th>Job</th><th>Talks to</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Frontend</td><td>Student and admin screens. In Docker and Kubernetes, Nginx serves the pages.</td><td>Backend, through /api</td></tr>
+          <tr><td>Backend</td><td>REST API, checks input, writes logs, exposes /metrics.</td><td>Postgres</td></tr>
+          <tr><td>Database</td><td>Stores the request rows. Locally this is Supabase. The CI cluster can start its own Postgres.</td><td>Backend only</td></tr>
+          <tr><td>Prometheus</td><td>Collects numbers from the API every 15 seconds.</td><td>Backend</td></tr>
+          <tr><td>Grafana</td><td>Dashboard: rate, errors, latency, uptime, CPU, memory.</td><td>Prometheus</td></tr>
+        </tbody>
+      </table>
+      <div class="callout">
+        The browser never sees the database password. In containers, Nginx inside the frontend forwards /api and /metrics to the service named backend. The connection string stays on the API.
+      </div>
+    </section>
+
+    <section class="page section">
+      <div class="kicker">Words you will be asked</div>
+      <h2>Every term, in easy language</h2>
+      <p>Read these in order. Later sections use the same words.</p>
+
+      <div class="term">
+        <h3>Frontend <span class="plain">the screens</span></h3>
+        <p>The part people click. Here it is a React app written in TypeScript, styled with Tailwind, built by Vite. React draws the pages. React Router changes the address without reloading the whole site. Axios sends HTTP calls to the API.</p>
+      </div>
+      <div class="term">
+        <h3>Backend <span class="plain">the office</span></h3>
+        <p>A Node.js program using Express. It receives requests such as “create this report” or “list pending reports”, checks them, and talks to the database. TypeScript is JavaScript with declared types, so many mistakes show up before the program runs.</p>
+      </div>
+      <div class="term">
+        <h3>REST API <span class="plain">a menu of URLs</span></h3>
+        <p>An agreed set of addresses and methods. GET reads. POST creates. PUT replaces fields. PATCH changes status. DELETE removes a row. A successful answer uses success, message, and data. A bad answer uses success: false plus a message.</p>
+      </div>
+      <div class="term">
+        <h3>Database and Postgres <span class="plain">the register</span></h3>
+        <p>Postgres is a relational database: tables, rows, and columns. The requests table holds title, description, category, location, priority, status, resolution notes, the student name, and timestamps. The API creates that table when it starts.</p>
+      </div>
+      <div class="term">
+        <h3>Supabase <span class="plain">hosted Postgres</span></h3>
+        <p>A hosted Postgres service. For a laptop demo, the API uses a connection string called DATABASE_URL. The password stays in .env or in a Kubernetes Secret. It is not written into the source code. SSL means the connection is encrypted on the way to Supabase.</p>
+      </div>
+      <div class="term">
+        <h3>Environment variable <span class="plain">a setting outside the code</span></h3>
+        <p>PORT, DATABASE_URL, FRONTEND_URL, and VITE_API_URL are settings. Change the machine, change the setting, leave the code alone. .env.example shows the names. The real .env is not committed.</p>
+      </div>
+      <div class="term">
+        <h3>Validation, Zod, Helmet, CORS <span class="plain">the door checks</span></h3>
+        <p>Zod rejects a title that is too short or a category that is not on the list. Helmet sets safer HTTP headers. CORS decides which websites may call the API. One error handler turns failures into the same JSON shape. Logs record time, method, route, status, and duration. They do not record passwords or the database URL.</p>
+      </div>
+      <div class="term">
+        <h3>Git and GitHub <span class="plain">history and the shared copy</span></h3>
+        <p>Git remembers every saved change. A commit is one saved snapshot with a message. A branch is a side line of work. GitHub stores that history online. A pull request is a proposal: “please merge this branch.” The rubric’s source stage starts here.</p>
+      </div>
+      <div class="term">
+        <h3>CI/CD <span class="plain">robots that repeat the boring steps</span></h3>
+        <p>Continuous integration means every push is built and tested automatically. Continuous delivery or deployment means the same robot can also ship the result. Doing it by hand once is a demo. Doing it in a workflow is a pipeline.</p>
+      </div>
+      <div class="term">
+        <h3>GitHub Actions <span class="plain">the robot we chose</span></h3>
+        <p>A workflow file, .github/workflows/ci-cd.yml, lists jobs and steps. It runs on GitHub’s machines when code is pushed to main or master, and on pull requests. Jenkins is another tool that can do this job. The rubric accepts either. This project uses GitHub Actions.</p>
+      </div>
+      <div class="term">
+        <h3>Build <span class="plain">turn source into something runnable</span></h3>
+        <p>npm run build compiles the TypeScript frontend into static files and the backend into JavaScript in dist/. Docker build then packs those results into images.</p>
+      </div>
+      <div class="term">
+        <h3>Test and lint <span class="plain">prove it, then check the types</span></h3>
+        <p>Backend tests use Jest and Supertest against an in-memory Postgres (pg-mem), so they do not need Supabase. They cover health, metrics, create, read, validation, and an admin status update. Frontend tests use Vitest and React Testing Library for the student dashboard, the form, and the request card. Lint here runs the TypeScript compiler in strict mode.</p>
+      </div>
+      <div class="term">
+        <h3>Docker, image, container <span class="plain">a packed lunch box</span></h3>
+        <p>An image is a packed snapshot of the app plus what it needs to run. A container is that image actually running. The backend image compiles TypeScript, then runs node dist/server.js as a normal user, not as root. The frontend image builds the site, then Nginx serves the files. Multi-stage means the compiler tools are left behind in the final image.</p>
+      </div>
+      <div class="term">
+        <h3>Docker Compose <span class="plain">start several boxes together</span></h3>
+        <p>docker compose up --build starts the API, the website, Prometheus, and Grafana on one machine. The database stays on Supabase unless you point the API elsewhere. Useful local addresses: website :3000, API health :5000, metrics :5000/metrics, Prometheus :9090, Grafana :3001.</p>
+      </div>
+      <div class="term">
+        <h3>Nginx and reverse proxy <span class="plain">the receptionist</span></h3>
+        <p>Nginx serves the React files. When the browser asks for /api or /metrics, Nginx forwards that call to the backend container. The browser stays on one address. That is a reverse proxy.</p>
+      </div>
+      <div class="term">
+        <h3>Kubernetes <span class="plain">a scheduler for containers</span></h3>
+        <p>Kubernetes runs containers, restarts them if they die, and gives them stable names. A manifest is a YAML file that says what you want: “two concepts matter — the desired state, and the cluster making reality match it.”</p>
+      </div>
+      <div class="term">
+        <h3>Pod, Deployment, Service <span class="plain">the running unit, the manager, the address</span></h3>
+        <p>A pod is one or more containers that run together. A Deployment keeps the right number of pods alive and rolls out a new image. A Service is a stable name and port in front of changing pods. NodePort publishes that service on a fixed port of the cluster node, so a viva can open the site from the laptop.</p>
+      </div>
+      <div class="term">
+        <h3>Namespace, ConfigMap, Secret <span class="plain">a folder, settings, and passwords</span></h3>
+        <p>The namespace smart-campus keeps this app’s objects together. A ConfigMap holds non-secret settings such as the port and allowed website origin. A Secret holds DATABASE_URL. Terraform creates that Secret. The password file is not applied from git.</p>
+      </div>
+      <div class="term">
+        <h3>Liveness and readiness <span class="plain">is it alive, and is it ready</span></h3>
+        <p>A liveness probe asks “is the process still healthy?” Kubernetes restarts it if not. A readiness probe asks “should I send users yet?” The API exposes /api/health/live for liveness and a fuller /api/health that also reports the database. Deployments also set CPU and memory requests and limits so one container cannot silently eat the machine.</p>
+      </div>
+      <div class="term">
+        <h3>Minikube <span class="plain">Kubernetes on your laptop</span></h3>
+        <p>A real cluster is many machines. Minikube is one small cluster inside Docker on a single computer, which is enough to show pods, services, and a deploy. GitHub Actions starts Minikube for the same reason: without a cluster, deployment would only be a file check.</p>
+      </div>
+      <div class="term">
+        <h3>Terraform <span class="plain">infrastructure as code</span></h3>
+        <p>Terraform reads .tf files and creates the namespace, workloads, and database secret through the Kubernetes provider. You describe the end state. Terraform applies it. Ansible is another allowed tool for this slot. This project uses Terraform, not Ansible. use_in_cluster_database=true also starts Postgres inside the cluster, which is what the CI job does so the pipeline does not depend on a personal Supabase password.</p>
+      </div>
+      <div class="term">
+        <h3>Monitoring, Prometheus, scrape <span class="plain">asking “how are you?” on a timer</span></h3>
+        <p>Monitoring is watching a running system with numbers, not by staring at a terminal. Prometheus pulls those numbers. A scrape is one pull. Every 15 seconds it calls GET /metrics on the backend. A target is UP when that pull succeeds.</p>
+      </div>
+      <div class="term">
+        <h3>Metric, counter, gauge, histogram <span class="plain">three kinds of number</span></h3>
+        <p>A counter only goes up, such as total HTTP requests. A gauge moves up and down, such as requests in progress right now. A histogram sorts durations into buckets so you can ask “how slow were the slowest 5 percent?” Labels such as method, route, and status code let one metric split into several series. Routes use the pattern /api/requests/:id, not the real id, so one student does not create a brand-new series.</p>
+      </div>
+      <div class="term">
+        <h3>Grafana <span class="plain">the charts</span></h3>
+        <p>Grafana does not collect the numbers itself. It queries Prometheus and draws the Smart Campus Maintenance dashboard. The datasource is provisioned automatically in both Compose and Kubernetes, so you do not click through a setup wizard during the demo.</p>
+      </div>
+      <div class="term">
+        <h3>Health check <span class="plain">a simple “I am here”</span></h3>
+        <p>GET /api/health returns status, service name, time, uptime, and database state. It is the first curl in a viva. /metrics is the longer page Prometheus reads. Scrapes of /metrics are not counted as normal user traffic, so the dashboard is not polluted by the monitor watching itself.</p>
+      </div>
+    </section>
+
+    <section class="page section">
+      <div class="kicker">What was built</div>
+      <h2>What we did, from the app to the pipeline</h2>
+      <p>The work is one repository, smart-campus-devops, with two applications and a delivery folder. Nothing here is a pile of unused microservices.</p>
+      <table>
+        <thead>
+          <tr><th>Folder</th><th>What it is</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>frontend/</td><td>React screens for students and administrators.</td></tr>
+          <tr><td>backend/</td><td>Express API, database access, logging, and Prometheus metrics.</td></tr>
+          <tr><td>devops/kubernetes/</td><td>Manifests for the website, API, Prometheus, and Grafana on Minikube.</td></tr>
+          <tr><td>devops/terraform/</td><td>The deploy step. Applies those manifests and can create in-cluster Postgres.</td></tr>
+          <tr><td>devops/monitoring/</td><td>Prometheus scrape config and the Grafana dashboard JSON.</td></tr>
+          <tr><td>devops/scripts/</td><td>Waits until the Prometheus target smart-campus-backend is UP.</td></tr>
+          <tr><td>.github/workflows/</td><td>The CI/CD pipeline.</td></tr>
+          <tr><td>docs/</td><td>Architecture note, viva script, this guide.</td></tr>
+        </tbody>
+      </table>
+
+      <h3>1. The application</h3>
+      <p>Students can create a request and see their own list. Administrators see counts (total, pending, in progress, resolved, rejected, critical), then search, filter, update, or delete. The API validates every write. Tests cover the important paths without a real cloud database.</p>
+
+      <h3>2. Packing it</h3>
+      <p>Each app has its own Dockerfile. Compose runs the website, API, Prometheus, and Grafana together. Locally the API still uses Supabase, so you do not install Postgres on the laptop for the Compose demo.</p>
+
+      <h3>3. Describing the cluster</h3>
+      <p>Kubernetes YAML describes the namespace, deployments, services, ConfigMap, probes, and resource limits. kubeconform checks those files against Kubernetes schemas even when no cluster is running. That check is necessary, and it is not the deploy itself.</p>
+
+      <h3>4. Deploying with Terraform</h3>
+      <p>terraform apply creates the objects. For a Supabase demo you pass database_url. For the automated pipeline you set use_in_cluster_database=true, so Postgres starts inside smart-campus and the API points at it. Images are loaded into Minikube first, and imagePullPolicy: IfNotPresent uses those local images.</p>
+
+      <h3>5. The pipeline that does this every time</h3>
+      <p>On a push or pull request, GitHub Actions runs this sequence:</p>
+      <ol>
+        <li>Checkout the source.</li>
+        <li>Install frontend and backend dependencies with npm ci.</li>
+        <li>Lint and test the frontend. Test the backend.</li>
+        <li>Build both apps.</li>
+        <li>Build both Docker images and check that the backend module loads and the frontend answers HTTP.</li>
+        <li>Check Compose config, kubeconform, and terraform validate.</li>
+        <li>On a push, push images to Docker Hub when those secrets exist. If the secrets are missing, the step says so and the workflow still continues.</li>
+        <li>Start Minikube, load the images built in that job, and terraform apply with Postgres inside the cluster.</li>
+        <li>Wait until Prometheus reports the backend target as UP.</li>
+      </ol>
+      <div class="callout">
+        That last step is the difference between “we wrote a dashboard” and “the pipeline proved monitoring is attached.” The script port-forwards Prometheus and reads its targets API until job smart-campus-backend has health up.
+      </div>
+    </section>
+
+    <section class="page section">
+      <div class="kicker">The numbers on the dashboard</div>
+      <h2>Metrics, explained one by one</h2>
+      <p>These are the application metrics, the numbers Prometheus stores. They are separate from the mark scheme in the next section. The API exposes them at GET /metrics using the prom-client library.</p>
+      <table>
+        <thead>
+          <tr><th>Name</th><th>Kind</th><th>What it means in plain words</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>http_requests_total</td>
+            <td>Counter</td>
+            <td>How many HTTP calls have finished, split by method, route, and status code. 200 is success. 400 is a bad form. 500 is the server failing.</td>
+          </tr>
+          <tr>
+            <td>http_request_duration_seconds</td>
+            <td>Histogram</td>
+            <td>How long those calls took. The dashboard uses this for p95: 95 percent of recent calls were faster than this number. The remaining 5 percent were slower.</td>
+          </tr>
+          <tr>
+            <td>http_active_requests</td>
+            <td>Gauge</td>
+            <td>How many calls are inside the API at this moment. It goes up when a call starts and down when it finishes.</td>
+          </tr>
+          <tr>
+            <td>app_uptime_seconds</td>
+            <td>Gauge</td>
+            <td>How long this API process has been running. A sudden drop to a small number means the process restarted.</td>
+          </tr>
+          <tr>
+            <td>process_cpu_user_seconds_total</td>
+            <td>Counter</td>
+            <td>CPU time used by the Node.js process. The chart shows the rate, which is “how busy is the CPU right now.”</td>
+          </tr>
+          <tr>
+            <td>process_resident_memory_bytes</td>
+            <td>Gauge</td>
+            <td>Memory the process is holding. A line that only climbs can mean a leak. A steady line is what you hope to see in a short demo.</td>
+          </tr>
+        </tbody>
+      </table>
+      <h3>What each Grafana panel is asking</h3>
+      <ul>
+        <li><strong>HTTP requests</strong> — the total so far: sum(http_requests_total).</li>
+        <li><strong>Request rate</strong> — calls per second over the last minute. rate() turns a counter into a speed.</li>
+        <li><strong>Error rate</strong> — the same speed, but only status codes 500–599. A flat zero during the demo is a healthy API.</li>
+        <li><strong>Response time p95</strong> — histogram_quantile(0.95, …). This is the “how slow is slow” number, in seconds.</li>
+        <li><strong>Request rate by status</strong> — the same speed, drawn as separate lines for 200, 400, and so on.</li>
+        <li><strong>CPU and memory</strong> — whether the process itself is struggling, not whether a student clicked the right button.</li>
+      </ul>
+      <p>The board refreshes every 5 seconds and looks at the last 15 minutes. Click around the website during the viva so the request-rate panel moves. Prometheus targets live at port 9090, path /targets. You want smart-campus-backend to say UP.</p>
+    </section>
+
+    <section class="page section">
+      <div class="kicker">The mark scheme from the rubric</div>
+      <h2>The Excellent column, and how this project meets it</h2>
+      <p>The sheet shared for this subject is <strong>FA2 Rubrics (10 Marks)</strong>. Three rows. The word Excellent is the top performance level in each row. This section is that matrix, then a direct reading of this repository against the Excellent cell.</p>
+
+      <h3>Row 1 — Selection of methods, tools, and design</h3>
+      <p>Allocated <strong>3 marks</strong>. Linked outcomes on the sheet: PO1, PO2, PO3, PO12. In the usual engineering-outcome wording, those are engineering knowledge, problem analysis, design of a solution, and the ability to keep learning. Your college’s official PO sentences are the ones printed in the syllabus.</p>
+      <table>
+        <thead>
+          <tr><th>Level</th><th>What the sheet asks</th><th>Marks</th></tr>
+        </thead>
+        <tbody>
+          <tr class="excellent">
+            <td>Excellent</td>
+            <td>All pipeline stages (source, build, test, containerization, deployment, monitoring) are designed for the requirements, and modern tools are selected: Jenkins or GitHub Actions, Docker, Kubernetes, Ansible or Terraform, Prometheus or Grafana.</td>
+            <td>3</td>
+          </tr>
+          <tr>
+            <td>Very Good</td>
+            <td>All stages are designed for the requirements, but the design still needs improvement, with modern tools selected.</td>
+            <td>2.5</td>
+          </tr>
+          <tr>
+            <td>Fair</td>
+            <td>Stages are designed only moderately, and modern DevOps tools are not selected.</td>
+            <td>1.5–2</td>
+          </tr>
+          <tr>
+            <td>Poor</td>
+            <td>Some stages are missing, and modern tools are not selected.</td>
+            <td>0.5–1</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="callout gold">
+        <strong>Where CampusDesk sits against Excellent.</strong>
+        The stages are designed in this order: GitHub source, npm and Docker build, automated tests, Docker images, Terraform onto Kubernetes, Prometheus scrape plus Grafana. The tool pairs are filled by one choice from each pair: GitHub Actions, Docker, Kubernetes on Minikube, Terraform, and both Prometheus and Grafana. Ansible and Jenkins are the other legal choices. You do not need both members of a pair.
+      </div>
+
+      <h3>Row 2 — Implementation</h3>
+      <p>Allocated <strong>5 marks</strong>. This is the heavy row. Outcomes on the sheet: PO1, PO2, PO3, PO4, PO5, PO12. PO4 is investigation (tests and the Prometheus check are the evidence). PO5 is modern tool usage.</p>
+      <table>
+        <thead>
+          <tr><th>Level</th><th>What the sheet asks</th><th>Marks</th></tr>
+        </thead>
+        <tbody>
+          <tr class="excellent">
+            <td>Excellent</td>
+            <td>A working end-to-end CI/CD pipeline: automated build, test, deployment, and monitoring, using modern tools.</td>
+            <td>5</td>
+          </tr>
+          <tr>
+            <td>Very Good</td>
+            <td>Meets the requirements but still needs improvement, with modern tools selected.</td>
+            <td>4</td>
+          </tr>
+          <tr>
+            <td>Fair</td>
+            <td>Only moderate accordance, and modern tools are not selected.</td>
+            <td>2–3</td>
+          </tr>
+          <tr>
+            <td>Poor</td>
+            <td>Not in accordance with the requirements, and modern tools are not selected.</td>
+            <td>1</td>
+          </tr>
+        </tbody>
+      </table>
+      <p>Excellent on this row is not “the YAML exists.” It is a pipeline that actually does the four verbs. In this repository those verbs are steps in ci-cd.yml:</p>
+      <table>
+        <thead>
+          <tr><th>Verb on the rubric</th><th>What the workflow does</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Build</td><td>npm run build for both apps, then docker build for both images.</td></tr>
+          <tr><td>Test</td><td>Frontend lint and test, backend test, then a live check that each image starts.</td></tr>
+          <tr><td>Deployment</td><td>Minikube starts, images are loaded, terraform apply creates the namespace and workloads, including Postgres for that run.</td></tr>
+          <tr><td>Monitoring</td><td>Prometheus and Grafana are part of that apply. The next step blocks until the backend target is UP.</td></tr>
+        </tbody>
+      </table>
+      <p>A green Actions run that includes the line “Prometheus target is UP” is the evidence for this cell. File checks alone (kubeconform, terraform validate) support the design row. They do not replace the deploy.</p>
+
+      <h3>Row 3 — Timely submission</h3>
+      <p>Allocated <strong>2 marks</strong>. Outcomes on the sheet: PO8 and PO12. PO8 is ethics: secrets stay out of git, logs do not print passwords, and the demo role switch is described honestly as a demo.</p>
+      <table>
+        <thead>
+          <tr><th>Level</th><th>What the sheet asks</th><th>Marks</th></tr>
+        </thead>
+        <tbody>
+          <tr class="excellent">
+            <td>Excellent</td>
+            <td>Submitted before the deadline, with an effective solution and a demonstration, plus appropriate contents, documentation, and modules.</td>
+            <td>2</td>
+          </tr>
+          <tr>
+            <td>Very Good</td>
+            <td>On time, effective solution and demonstration, but some improvement still needed.</td>
+            <td>1.5</td>
+          </tr>
+          <tr>
+            <td>Fair</td>
+            <td>Completed and submitted, with a fair solution and demonstration that still need improvement.</td>
+            <td>1</td>
+          </tr>
+          <tr>
+            <td>Poor</td>
+            <td>Late submission, satisfactory solution, unsatisfactory demonstration.</td>
+            <td>0.5</td>
+          </tr>
+        </tbody>
+      </table>
+      <p>The modules are the frontend, the backend, Kubernetes, Terraform, monitoring, and the workflow. The documentation is the README, the architecture note, and the viva script in docs/presentation/demo-script.md. The 2 marks also depend on submitting before the deadline and walking through a live demo. The repository cannot earn that clock for you.</p>
+
+      <h3>Reading the total</h3>
+      <table>
+        <thead>
+          <tr><th>Row</th><th>Excellent mark</th><th>What earns it here</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>1. Design and tools</td><td>3</td><td>Six stages designed, and one tool from each required pair.</td></tr>
+          <tr><td>2. Working pipeline</td><td>5</td><td>Actions builds, tests, deploys with Terraform to Minikube, and proves the Prometheus target is UP.</td></tr>
+          <tr><td>3. Submission and demo</td><td>2</td><td>On-time hand-in, docs, modules, and a short live walkthrough.</td></tr>
+          <tr><td>Total</td><td>10</td><td>3 + 5 + 2. The examiner awards the marks. This table is the map, not a grade already given.</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="page section">
+      <div class="kicker">If someone asks “so what?”</div>
+      <h2>Short answers you can say out loud</h2>
+      <div class="term">
+        <h3>What is the project?</h3>
+        <p>A campus maintenance desk. Students file repair requests. Admins update status. Underneath, a CI/CD pipeline builds, tests, containerizes, deploys, and monitors that app.</p>
+      </div>
+      <div class="term">
+        <h3>Why DevOps, if the website already works?</h3>
+        <p>Because the rubric grades the path, not only the form. A working form with no automated deploy and no monitoring is a lower row. The pipeline is the submission.</p>
+      </div>
+      <div class="term">
+        <h3>Why Minikube if GitHub Actions already runs it?</h3>
+        <p>Actions proves the pipeline on GitHub’s machine. Minikube on your laptop is how you show pods and the site in the room. Same manifests. Two places to run them.</p>
+      </div>
+      <div class="term">
+        <h3>Why Terraform if the YAML already exists?</h3>
+        <p>The YAML is the Kubernetes description. Terraform is the tool the rubric asks for in the Ansible-or-Terraform slot, and it is the command the pipeline runs to create that description on the cluster.</p>
+      </div>
+      <div class="term">
+        <h3>What should the demo order be?</h3>
+        <p>Git history, tests, docker compose and a status change in the UI, curl health and metrics, Prometheus targets, Grafana, the Actions log, then Minikube pods. Close by repeating the path: GitHub, Actions, build, test, Docker, Terraform, Kubernetes, application, Prometheus, Grafana.</p>
+      </div>
+      <footer class="note">
+        CampusDesk guide for the Smart Campus Maintenance project. Terms match the repository: React and Express applications, Supabase or in-cluster Postgres, Docker, Terraform, Kubernetes on Minikube, Prometheus, Grafana, and GitHub Actions. The mark table follows the FA2 rubric sheet (10 marks) with the Excellent, Very Good, Fair, and Poor columns.
+      </footer>
+    </section>
+  </article>
+</body>
+</html>

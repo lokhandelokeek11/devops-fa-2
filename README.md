@@ -5,7 +5,7 @@ CampusDesk is a college DevOps project for reporting and managing campus mainten
 The same repository shows the full delivery path:
 
 ```text
-Developer -> GitHub -> GitHub Actions -> Build -> Test -> Docker -> Kubernetes -> Application -> Prometheus -> Grafana
+Developer -> GitHub -> GitHub Actions -> Build -> Test -> Docker -> Terraform -> Kubernetes -> Application -> Prometheus -> Grafana
 ```
 
 ## 1. Project overview
@@ -42,7 +42,7 @@ In containers, the browser talks only to the frontend. Nginx proxies `/api` and 
 | Frontend | React, TypeScript, Vite, Tailwind CSS, React Router, Axios, Lucide |
 | Backend | Node.js, Express, TypeScript, Supabase Postgres, Zod, Helmet, CORS, Morgan, prom-client |
 | Tests | Vitest, React Testing Library, Jest, Supertest |
-| Delivery | Git, GitHub Actions, Docker, Docker Compose, Kubernetes, Minikube |
+| Delivery | Git, GitHub Actions, Docker, Docker Compose, Terraform, Kubernetes, Minikube |
 | Observability | Prometheus, Grafana |
 
 ## 5. Folder structure
@@ -52,6 +52,7 @@ smart-campus-devops/
 ├── frontend/                 React application
 ├── backend/                  Express API
 ├── devops/kubernetes/        Minikube manifests
+├── devops/terraform/         Terraform deploy of those manifests
 ├── devops/monitoring/        Prometheus and Grafana
 ├── .github/workflows/        CI/CD pipeline
 ├── docs/                     Architecture, screenshots, viva script
@@ -188,7 +189,9 @@ Manifests live in `devops/kubernetes/`.
 | `backend-configmap.yaml`, `backend-secret.yaml` | API configuration, including the Supabase connection |
 | `prometheus-*`, `grafana-*` | Metrics and the dashboard |
 
-The backend reads `DATABASE_URL` from a Secret and the port, environment, and allowed origin from a ConfigMap. Replace the placeholder in `backend-secret.yaml` with your Supabase URI before you deploy. Every deployment has readiness and liveness probes plus CPU and memory requests and limits. The database is not deployed inside the cluster.
+The backend reads `DATABASE_URL` from a Secret and the port, environment, and allowed origin from a ConfigMap. Terraform creates that Secret. Every deployment has readiness and liveness probes plus CPU and memory requests and limits.
+
+`devops/terraform/` is the deploy path. It applies the manifests in `devops/kubernetes/` with the Kubernetes provider. `backend-secret.yaml` stays out of that apply so the Supabase password is not committed. Set `use_in_cluster_database = true` to create Postgres inside the cluster, which is what the CI job does. For a Supabase deploy, copy `terraform.tfvars.example` to `terraform.tfvars` and set `database_url`.
 
 Check the manifests without a cluster. `kubeconform` validates them against the Kubernetes schemas. The CI job runs the same check:
 
@@ -205,20 +208,24 @@ kubectl apply --dry-run=client -f devops/kubernetes/
 
 ## 14. Minikube deployment
 
-Minikube must build or see the local images. Point Docker at Minikube, build, then apply the manifests.
+Minikube must see the local images. Build them, load them into Minikube, then let Terraform create the namespace, workloads, and the database Secret.
 
 ```powershell
 minikube start --cpus=2 --memory=4096 --driver=docker
-minikube docker-env --shell powershell | Invoke-Expression
 docker build -t smart-campus-backend:local ./backend
 docker build -t smart-campus-frontend:local ./frontend
-kubectl apply -f devops/kubernetes/namespace.yaml
-kubectl apply -f devops/kubernetes/
+minikube image load smart-campus-backend:local
+minikube image load smart-campus-frontend:local
+terraform -chdir=devops/terraform init
+terraform -chdir=devops/terraform apply -var "use_in_cluster_database=true"
 kubectl get pods -n smart-campus
 minikube service frontend -n smart-campus
+bash devops/scripts/check-prometheus-target.sh
 ```
 
-`imagePullPolicy: IfNotPresent` uses the images you just built. Prometheus reaches the API at `backend.smart-campus.svc.cluster.local:5000`. Grafana uses the in-cluster Prometheus service at `http://prometheus:9090`.
+On bash, `terraform -chdir` works the same way. `imagePullPolicy: IfNotPresent` uses the images you loaded. Prometheus reaches the API at `backend.smart-campus.svc.cluster.local:5000`. Grafana uses the in-cluster Prometheus service at `http://prometheus:9090`.
+
+`use_in_cluster_database=true` starts Postgres in the `smart-campus` namespace and points the API at it. To use Supabase instead, apply with `-var "database_url=YOUR_SUPABASE_URI" -var "database_ssl=true"` and leave the in-cluster database off. The check script waits until the `smart-campus-backend` Prometheus target is `up`.
 
 Useful checks:
 
@@ -267,7 +274,7 @@ The datasource uid is `prometheus`, which matches the panels. Compose and Kubern
 
 ## 17. Testing
 
-Backend tests cover health, metrics, creating a request, reading it back, validation, and an administrator status update. They use an in-memory MongoDB, so a separate database is not required.
+Backend tests cover health, metrics, creating a request, reading it back, validation, and an administrator status update. They use an in-memory Postgres (`pg-mem`), so a separate database is not required.
 
 ```powershell
 cd backend
@@ -294,8 +301,10 @@ npm test
 5. Frontend build and backend build
 6. Docker build
 7. Docker image validation
-8. Deployment preparation (`docker compose config` and `kubeconform` schema checks)
+8. Deployment preparation (`docker compose config`, `kubeconform`, and `terraform validate`)
 9. Push images when Docker Hub secrets exist
+10. Start Minikube, load the images built in this job, and `terraform apply` with Postgres inside the cluster
+11. Wait until the Prometheus target `smart-campus-backend` is UP
 
 Secrets, set in the GitHub repository and never in source code:
 
@@ -363,10 +372,10 @@ curl.exe http://localhost:5000/api/admin/stats
 1. Create a feature branch and commit the change.
 2. Open a pull request. GitHub Actions installs dependencies, lints, tests, and builds both apps.
 3. The same workflow builds Docker images and checks that the backend module loads and the frontend responds.
-4. It validates Compose and the Kubernetes manifests.
+4. It validates Compose, the Kubernetes manifests, and the Terraform configuration.
 5. On a push to `main`, it pushes images when Docker Hub secrets are configured.
-6. Deploy to Minikube with the commands in section 14.
-7. Use the app, then open Prometheus targets and the Grafana dashboard.
+6. It starts Minikube and deploys the stack with Terraform, including an in-cluster Postgres for that run.
+7. It confirms the Prometheus target is UP, then you can open the app and Grafana.
 
 Suggested Git commands:
 

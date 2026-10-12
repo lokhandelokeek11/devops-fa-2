@@ -49,22 +49,23 @@ curl.exe http://localhost:5000/metrics
 
 ## 6. GitHub Actions
 
-Open the Actions tab and show the workflow stages: checkout, install, lint, test, build, Docker build, image validation, deployment preparation.
+Open the Actions tab and show the workflow stages: checkout, install, lint, test, build, Docker build, image validation, Terraform validation, Minikube deploy, and the Prometheus target check.
 
 ## 7. Kubernetes on Minikube
 
 ```powershell
 minikube start --cpus=2 --memory=4096 --driver=docker
-minikube docker-env --shell powershell | Invoke-Expression
 docker build -t smart-campus-backend:local ./backend
 docker build -t smart-campus-frontend:local ./frontend
-kubectl apply -f devops/kubernetes/namespace.yaml
-kubectl apply -f devops/kubernetes/
+minikube image load smart-campus-backend:local
+minikube image load smart-campus-frontend:local
+terraform -chdir=devops/terraform init
+terraform -chdir=devops/terraform apply -var "use_in_cluster_database=true"
 kubectl get pods -n smart-campus
 minikube service frontend -n smart-campus
 ```
 
-Show a pod becoming Ready, then open the frontend URL Minikube prints.
+Show a pod becoming Ready, then open the frontend URL Minikube prints. Point at `devops/terraform/` as the deploy step, and at the Actions log line `Prometheus target is UP`.
 
 ## 8. Close
 

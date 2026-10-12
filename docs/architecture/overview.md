@@ -8,6 +8,7 @@ Developer
   -> GitHub Actions
   -> Build and test
   -> Docker images
+  -> Terraform
   -> Kubernetes (Minikube)
   -> CampusDesk
   -> Prometheus

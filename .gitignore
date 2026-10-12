@@ -13,3 +13,9 @@ Thumbs.db
 .vscode/
 *.tsbuildinfo
 .mongo-data/
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfstate.backup
+terraform.tfvars
+crash.log

@@ -81,11 +81,19 @@ jobs:
           docker rm -f campus-frontend-validate
           echo "Docker images validated"
 
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.10.5
+
       - name: Deployment preparation
         run: |
           docker compose config >/dev/null
           docker run --rm -v "$PWD:/src" -w /src ghcr.io/yannh/kubeconform:v0.6.7 -summary -strict devops/kubernetes
-          echo "Kubernetes manifests are ready for Minikube"
+          terraform -chdir=devops/terraform fmt -check
+          terraform -chdir=devops/terraform init -input=false
+          terraform -chdir=devops/terraform validate
+          echo "Kubernetes manifests and Terraform configuration are valid"
 
       - name: Push images to Docker Hub
         if: github.event_name == 'push'
@@ -102,3 +110,25 @@ jobs:
           docker tag smart-campus-backend:ci "$DOCKERHUB_USERNAME/smart-campus-backend:latest"
           docker push "$DOCKERHUB_USERNAME/smart-campus-frontend:latest"
           docker push "$DOCKERHUB_USERNAME/smart-campus-backend:latest"
+
+      - name: Start Minikube
+        uses: medyagh/setup-minikube@v0.0.21
+        with:
+          driver: docker
+          cpus: 2
+          memory: 4000m
+
+      - name: Load application images into Minikube
+        run: |
+          docker tag smart-campus-frontend:ci smart-campus-frontend:local
+          docker tag smart-campus-backend:ci smart-campus-backend:local
+          minikube image load smart-campus-frontend:local
+          minikube image load smart-campus-backend:local
+
+      - name: Deploy the cluster with Terraform
+        run: |
+          terraform -chdir=devops/terraform apply -auto-approve -input=false \
+            -var "use_in_cluster_database=true"
+
+      - name: Confirm the Prometheus target is UP
+        run: bash devops/scripts/check-prometheus-target.sh
